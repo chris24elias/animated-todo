@@ -12,6 +12,9 @@ const Colors = {
   white: '#ffffff',
   black: '#000000',
   grey: '#cccccc',
+  primary: '#0375FF',
+  border: '#EDF0FC',
+  darkBorder: '#8595C6',
 };
 
 const theme = extendTheme({
