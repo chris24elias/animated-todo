@@ -13,6 +13,7 @@ import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTiming } from '../../utils';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MotiView } from 'moti';
 
 export type IAddTaskProps = {
   // visible: boolean;
@@ -24,15 +25,24 @@ export type IAddTaskProps = {
   //   };
   // onClose: () => void;
   // progress: Animated.SharedValue<number>;
+  addNewTask: () => void;
 };
 
-const AddTask: React.FC<IAddTaskProps> = () => {
+const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const [visible, setVisible] = useState(false);
   const timeoutRef = useRef<any>(-1);
   const opacity = useSharedValue(0);
   const insets = useSafeAreaInsets();
   const theme = useTheme();
+  const [text, setText] = useState('');
+
+  const onNewTaskPress = () => {
+    toggleVisible();
+    setTimeout(() => {
+      addNewTask(text);
+    }, 700);
+  };
 
   const progress = useTiming(visible, {
     duration: 450,
@@ -187,10 +197,18 @@ const AddTask: React.FC<IAddTaskProps> = () => {
         >
           <MaterialIcons name="close" size={24} />
         </Pressable>
-        <Box width={'100%'} pl="10">
+
+        <MotiView
+          delay={visible ? 250 : 0}
+          animate={{ translateY: !visible ? -20 : 0 }}
+          transition={{ type: 'timing', duration: 400 }}
+          style={{ width: '100%', paddingLeft: theme.space[10] }}
+        >
           <Box marginBottom={'10'}>
             <TextInput
               placeholder="Enter  new task"
+              value={text}
+              onChangeText={setText}
               style={{
                 height: 35,
                 width: 250,
@@ -267,27 +285,39 @@ const AddTask: React.FC<IAddTaskProps> = () => {
             <MaterialIcons name="outlined-flag" size={24} color={theme.colors.darkBorder} />
             <Feather name="moon" size={24} color={theme.colors.darkBorder} />
           </Row>
-        </Box>
-        <Pressable
-          style={{ position: 'absolute', bottom: insets.bottom + 15, right: 30 }}
-          // mt="16"
-          // alignSelf={'flex-end'}
-          // mr="8"
-          flexDirection={'row'}
-          // py="4"
-          height={60}
-          borderRadius="full"
-          shadow="3"
-          justifyContent={'center'}
-          alignItems="center"
-          bg="primary"
-          width={170}
+        </MotiView>
+        <MotiView
+          delay={visible ? 280 : 0}
+          // from={{ opacity: 0 }}
+          animate={{ opacity: visible ? 1 : 0, translateY: !visible ? -50 : 0 }}
+          transition={{ type: 'timing', duration: 400 }}
+          style={{
+            position: 'absolute',
+            bottom: insets.bottom + 15,
+            right: 30,
+          }}
         >
-          <Text mr="4" fontWeight={'bold'} color="white">
-            New task
-          </Text>
-          <Feather name="chevron-up" size={26} color="white" />
-        </Pressable>
+          <Pressable
+            onPress={onNewTaskPress}
+            // mt="16"
+            // alignSelf={'flex-end'}
+            // mr="8"
+            flexDirection={'row'}
+            // py="4"
+            height={60}
+            borderRadius="full"
+            shadow="3"
+            justifyContent={'center'}
+            alignItems="center"
+            bg="primary"
+            width={170}
+          >
+            <Text mr="4" fontWeight={'bold'} color="white">
+              New task
+            </Text>
+            <Feather name="chevron-up" size={26} color="white" />
+          </Pressable>
+        </MotiView>
       </Animated.View>
     </>
   );
