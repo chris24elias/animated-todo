@@ -1,5 +1,5 @@
 import { Box, Pressable, Row, Text, useTheme } from 'native-base';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
@@ -10,22 +10,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
-import { useTiming } from '../../utils';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 
 export type IAddTaskProps = {
-  // visible: boolean;
-  //   btnLayout: {
-  //     height: number;
-  //     width: number;
-  //     x: number;
-  //     y: number;
-  //   };
-  // onClose: () => void;
-  // progress: Animated.SharedValue<number>;
-  addNewTask: () => void;
+  addNewTask: (text: string) => void;
 };
 
 const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
@@ -36,18 +26,30 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const [text, setText] = useState('');
+  const containerOpacity = useSharedValue(0);
+  const progress = useSharedValue(0);
 
   const onNewTaskPress = () => {
-    toggleVisible();
+    addNewTask(text);
+
     setTimeout(() => {
-      addNewTask(text);
-    }, 700);
+      containerOpacity.value = withTiming(0, { duration: 400 });
+      opacity.value = withTiming(0, { duration: 200 });
+    }, 50);
+
+    setTimeout(() => {
+      setVisible(false);
+      setText('');
+    }, 1000);
   };
 
-  const progress = useTiming(visible, {
-    duration: 450,
-    easing: Easing.inOut(Easing.ease),
-  });
+  useEffect(() => {
+    progress.value = withTiming(visible ? 1 : 0, {
+      duration: 450,
+      easing: Easing.inOut(Easing.ease),
+    });
+    containerOpacity.value = withTiming(visible ? 1 : 0);
+  }, [visible]);
 
   const toggleVisible = () => {
     const nextVal = !visible;
@@ -73,39 +75,30 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   });
 
   const onButtonLayout = (e) => {
-    console.log('e', e.nativeEvent.layout);
     setBtnLayout(e.nativeEvent.layout);
   };
 
   const animatedStyle = useAnimatedStyle(() => {
     const size = screenHeight * 2;
-    // const opacity = interpolate(progress.value, [0, 1], [0, 1]);
-    // const borderRadius = interpolate(
-    //   progress.value,
-    //   [0, 1],
-    //   [size / 2, 0]
-    // );
     const height = interpolate(progress.value, [0, 1], [btnLayout.height, size]);
     const width = interpolate(progress.value, [0, 1], [btnLayout.height, size]);
     const offset = size / 2 - screenWidth / 2;
     const x = interpolate(progress.value, [0, 1], [btnLayout.x, -offset]);
     const y = interpolate(progress.value, [0, 1], [btnLayout.y, -offset]);
-    const bg = interpolateColor(progress.value, [0, 1], ['rgb(37, 99, 235)', 'rgb(255, 255, 255)']);
-    const op = interpolate(progress.value, [0, 0.2, 1], [0, 1, 1]);
+
     return {
-      opacity: op,
+      opacity: containerOpacity.value,
       borderRadius: size / 2,
       height,
       width,
       top: y,
       left: x,
-      backgroundColor: bg,
+      backgroundColor: 'white',
       zIndex: 9,
     };
   });
 
   const buttonStyle = useAnimatedStyle(() => {
-    // const rotate = interpolate(progress.value, [0, 1], [0, 45]);
     const bg = interpolateColor(progress.value, [0, 1], ['#2563eb', '#1e3a8a']);
     const op = interpolate(progress.value, [0, 1], [1, 0]);
     return {
@@ -118,46 +111,29 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
       height: 64,
       width: 64,
       borderRadius: 64 / 2,
-      // transform: [{ rotate: `${rotate}deg` }],
     };
   });
 
   const contentStyle = useAnimatedStyle(() => {
-    // const opacity = interpolate(progress.value, [0, 0.8, 1], [0, 0, 1]);
-
     return {
       position: 'absolute',
       height: '100%',
       width: '100%',
       zIndex: 10,
       justifyContent: 'center',
-      // alignItems: 'center',
       opacity: opacity.value,
     };
   });
-
-  // const newTaskStyle = useAnimatedStyle(() => {
-  //   return {};
-  // });
 
   return (
     <>
       <Animated.View style={[buttonStyle]} onLayout={onButtonLayout}>
         <Pressable
           onPress={toggleVisible}
-          // position={"absolute"}
-          // height={"16"}
-          // width={"16"}
-          // borderRadius="full"
           flex={1}
-          // bottom={"8"}
-          // right={"8"}
-          // bg={"blue.600"}
           justifyContent={'center'}
           alignItems={'center'}
           shadow={'8'}
-
-          // zIndex={10}
         >
           <MaterialIcons name="add" size={32} color="white" />
         </Pressable>
@@ -168,9 +144,6 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
         style={[
           {
             position: 'absolute',
-            //   height,
-            //   width,
-            // backgroundColor: "white",
             justifyContent: 'center',
             alignItems: 'center',
           },
@@ -192,8 +165,6 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
           justifyContent={'center'}
           alignItems={'center'}
           borderColor="border"
-
-          // zIndex={10}
         >
           <MaterialIcons name="close" size={24} />
         </Pressable>
@@ -212,12 +183,10 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
               style={{
                 height: 35,
                 width: 250,
-                // borderWidth: 2,
+                fontWeight: '500',
                 backgroundColor: '#FFFFFF',
                 borderRadius: 12,
-                // paddingLeft: 10,
                 borderWidth: 0,
-                // borderColor: 'white',
                 fontSize: 26,
                 color: theme.colors.darkBorder,
               }}
@@ -299,11 +268,7 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
         >
           <Pressable
             onPress={onNewTaskPress}
-            // mt="16"
-            // alignSelf={'flex-end'}
-            // mr="8"
             flexDirection={'row'}
-            // py="4"
             height={60}
             borderRadius="full"
             shadow="3"

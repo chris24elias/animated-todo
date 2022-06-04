@@ -1,5 +1,5 @@
 import { Box, Heading, ScrollView, Text } from 'native-base';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CategoryCard } from '../../components/CategoryCard';
 import TaskCard from '../../components/TaskCard';
 import { Header } from '../../components/Header';
@@ -37,6 +37,14 @@ const TASKS = [
 const Home: React.FC<IHomeProps> = () => {
   const [tasks, setTasks] = useState(TASKS);
 
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
+  useEffect(() => {
+    if (isFirstRender) {
+      setIsFirstRender(false);
+    }
+  }, []);
+
   const onAddNewTask = (task: string) => {
     setTasks([
       {
@@ -63,8 +71,8 @@ const Home: React.FC<IHomeProps> = () => {
         </Text>
         <Box marginTop={'2'}>
           <ScrollView paddingLeft={'5'} paddingY={'2'} horizontal>
-            {[1, 2, 3, 4].map(() => {
-              return <CategoryCard />;
+            {[1, 2, 3, 4].map((val) => {
+              return <CategoryCard key={val} />;
             })}
           </ScrollView>
         </Box>
@@ -75,7 +83,7 @@ const Home: React.FC<IHomeProps> = () => {
         <Box marginTop={'2'}>
           <Box paddingX={'5'}>
             {tasks.map((task, i) => {
-              return <TaskCard key={task.id} task={task} index={i} />;
+              return <TaskCard key={task.id} task={task} index={i} useAnimation={!isFirstRender} />;
             })}
           </Box>
         </Box>

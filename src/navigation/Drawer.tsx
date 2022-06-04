@@ -15,6 +15,14 @@ export type IDrawerProps = {};
 
 const DrawerNav = createDrawerNavigator();
 
+const RenderHome = (props) => {
+  return (
+    <WrapDrawerScreen>
+      <Home {...props} />
+    </WrapDrawerScreen>
+  );
+};
+
 const Drawer: React.FC<IDrawerProps> = () => {
   return (
     <View style={{ flex: 1, backgroundColor: '#0C2260' }}>
@@ -42,7 +50,7 @@ const Drawer: React.FC<IDrawerProps> = () => {
         >
           <DrawerNav.Screen
             name="Home"
-            component={WrapDrawerScreen(Home)}
+            component={RenderHome}
             options={() => {
               return {
                 headerShown: false,
@@ -94,34 +102,62 @@ const CustomDrawerContent = (props) => {
   );
 };
 
-export const WrapDrawerScreen: (Screen: any) => React.FC = (Screen) => {
-  return (props) => {
-    const progress = useDrawerProgress();
+// export const WrapDrawerScreen: (Screen: any) => React.FC = (Screen) => {
+//   return (props) => {
+//     const progress = useDrawerProgress();
 
-    const animatedStyle = useAnimatedStyle(() => {
-      const scale = interpolate(progress.value, [0, 1], [1, 0.85], Extrapolate.CLAMP);
-      const borderRadius = interpolate(progress.value, [0, 1], [1, 20], Extrapolate.CLAMP);
-      return {
-        borderRadius,
-        transform: [{ scale }],
-      };
-    });
+//     const animatedStyle = useAnimatedStyle(() => {
+//       const scale = interpolate(progress.value, [0, 1], [1, 0.85], Extrapolate.CLAMP);
+//       const borderRadius = interpolate(progress.value, [0, 1], [1, 20], Extrapolate.CLAMP);
+//       return {
+//         borderRadius,
+//         transform: [{ scale }],
+//       };
+//     });
 
-    return (
-      <Animated.View
-        style={[
-          {
-            flex: 1,
-            backgroundColor: 'white',
-            overflow: 'hidden',
-          },
-          animatedStyle,
-        ]}
-      >
-        <Screen {...props} />
-      </Animated.View>
-    );
-  };
+//     return (
+//       <Animated.View
+//         style={[
+//           {
+//             flex: 1,
+//             backgroundColor: 'white',
+//             overflow: 'hidden',
+//           },
+//           animatedStyle,
+//         ]}
+//       >
+//         <Screen {...props} />
+//       </Animated.View>
+//     );
+//   };
+// };
+
+const WrapDrawerScreen = ({ children }) => {
+  const progress = useDrawerProgress();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = interpolate(progress.value, [0, 1], [1, 0.85], Extrapolate.CLAMP);
+    const borderRadius = interpolate(progress.value, [0, 1], [1, 20], Extrapolate.CLAMP);
+    return {
+      borderRadius,
+      transform: [{ scale }],
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[
+        {
+          flex: 1,
+          backgroundColor: 'white',
+          overflow: 'hidden',
+        },
+        animatedStyle,
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
 };
 
 export { Drawer };

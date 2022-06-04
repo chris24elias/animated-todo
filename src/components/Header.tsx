@@ -28,7 +28,7 @@ const Header: React.FC<IHeaderProps> = () => {
                 // marginLeft: 20,
               }
             }
-            onPress={() => navigation.openDrawer()}
+            onPress={() => navigation.toggleDrawer()}
           />
           {/* <Text color="black" fontSize="20" fontWeight="bold">
             Home
