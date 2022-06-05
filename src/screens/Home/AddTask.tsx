@@ -3,10 +3,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
-  interpolate,
-  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
@@ -22,50 +21,9 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const [visible, setVisible] = useState(false);
   const timeoutRef = useRef<any>(-1);
-  const opacity = useSharedValue(0);
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const [text, setText] = useState('');
-  const containerOpacity = useSharedValue(0);
-  const progress = useSharedValue(0);
-
-  const onNewTaskPress = () => {
-    addNewTask(text);
-
-    setTimeout(() => {
-      containerOpacity.value = withTiming(0, { duration: 400 });
-      opacity.value = withTiming(0, { duration: 200 });
-    }, 50);
-
-    setTimeout(() => {
-      setVisible(false);
-      setText('');
-    }, 1000);
-  };
-
-  useEffect(() => {
-    progress.value = withTiming(visible ? 1 : 0, {
-      duration: 450,
-      easing: Easing.inOut(Easing.ease),
-    });
-    containerOpacity.value = withTiming(visible ? 1 : 0);
-  }, [visible]);
-
-  const toggleVisible = () => {
-    const nextVal = !visible;
-    clearTimeout(timeoutRef.current);
-    if (nextVal) {
-      setVisible(nextVal);
-      timeoutRef.current = setTimeout(() => {
-        opacity.value = withTiming(!visible ? 1 : 0);
-      }, 280);
-    } else {
-      opacity.value = withTiming(!visible ? 1 : 0);
-      timeoutRef.current = setTimeout(() => {
-        setVisible(nextVal);
-      }, 200);
-    }
-  };
 
   const [btnLayout, setBtnLayout] = useState({
     height: 0,
@@ -74,17 +32,113 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
     y: 0,
   });
 
+  const containerOpacity = useSharedValue(0);
+  const containerHeight = useSharedValue(btnLayout.height);
+  const containerWidth = useSharedValue(btnLayout.height);
+  const containerX = useSharedValue(btnLayout.x);
+  const containerY = useSharedValue(btnLayout.y);
+
+  const buttonBg = useSharedValue('#2563eb');
+  const buttonOp = useSharedValue(1);
+
+  const contentOpacity = useSharedValue(0);
+  const subContentOpacity = useSharedValue(1);
+
+  const onNewTaskPress = () => {
+    addNewTask(text);
+
+    // setTimeout(() => {
+    //   containerOpacity.value = withTiming(0, { duration: 400 });
+    //   contentOpacity.value = withTiming(0, { duration: 200 });
+    // }, 50);
+
+    containerHeight.value = withTiming(88, {
+      duration: 375,
+      // easing: Easing.inOut(Easing.ease),
+    });
+    containerY.value = withTiming(290, {
+      duration: 375,
+      // easing: Easing.inOut(Easing.ease),
+    });
+
+    containerOpacity.value = withDelay(325, withTiming(0, { duration: 50 }));
+    contentOpacity.value = withDelay(325, withTiming(0, { duration: 50 }));
+    subContentOpacity.value = withTiming(0);
+
+    setTimeout(() => {
+      setVisible(false);
+      setText('');
+    }, 550);
+  };
+
+  const timingConfig = {
+    duration: 450,
+    easing: Easing.inOut(Easing.ease),
+  };
+
+  useEffect(() => {
+    // progress.value = withTiming(visible ? 1 : 0, {
+    //   duration: 450,
+    //   easing: Easing.inOut(Easing.ease),
+    // });
+
+    if (visible) {
+      maximize();
+    } else {
+      minimize();
+    }
+  }, [visible]);
+
+  const maximize = () => {
+    clearTimeout(timeoutRef.current);
+    const size = screenHeight * 2;
+    const offset = size / 2 - screenWidth / 2;
+    containerHeight.value = withTiming(size, timingConfig);
+    containerWidth.value = withTiming(size, timingConfig);
+    containerX.value = withTiming(-offset, timingConfig);
+    containerY.value = withTiming(-offset, timingConfig);
+    buttonOp.value = withTiming(0, timingConfig);
+    buttonBg.value = withTiming('#1e3a8a', timingConfig);
+    containerOpacity.value = withTiming(1, timingConfig);
+
+    contentOpacity.value = withDelay(280, withTiming(1, timingConfig));
+
+    subContentOpacity.value = withTiming(1);
+  };
+
+  const minimize = () => {
+    clearTimeout(timeoutRef.current);
+    contentOpacity.value = withTiming(0, timingConfig);
+
+    timeoutRef.current = setTimeout(() => {
+      containerHeight.value = withTiming(btnLayout.height, timingConfig);
+      containerWidth.value = withTiming(btnLayout.height, timingConfig);
+      containerX.value = withTiming(btnLayout.x, timingConfig);
+      containerY.value = withTiming(btnLayout.y, timingConfig);
+      containerOpacity.value = withTiming(0, timingConfig);
+
+      buttonOp.value = withTiming(1, timingConfig);
+      buttonBg.value = withTiming('#2563eb', timingConfig);
+    }, 280);
+  };
+
+  const toggleVisible = () => {
+    const nextVal = !visible;
+    setVisible(nextVal);
+  };
+
   const onButtonLayout = (e) => {
     setBtnLayout(e.nativeEvent.layout);
+    minimize();
   };
 
   const animatedStyle = useAnimatedStyle(() => {
     const size = screenHeight * 2;
-    const height = interpolate(progress.value, [0, 1], [btnLayout.height, size]);
-    const width = interpolate(progress.value, [0, 1], [btnLayout.height, size]);
-    const offset = size / 2 - screenWidth / 2;
-    const x = interpolate(progress.value, [0, 1], [btnLayout.x, -offset]);
-    const y = interpolate(progress.value, [0, 1], [btnLayout.y, -offset]);
+    const height = containerHeight.value; // interpolate(progress.value, [0, 1], [btnLayout.height, size]);
+    const width = containerWidth.value; // interpolate(progress.value, [0, 1], [btnLayout.height, size]);
+    // const offset = size / 2 - screenWidth / 2;
+    const x = containerX.value; // interpolate(progress.value, [0, 1], [btnLayout.x, -offset]);
+    const y = containerY.value; //interpolate(progress.value, [0, 1], [btnLayout.y, -offset]);
 
     return {
       opacity: containerOpacity.value,
@@ -99,8 +153,8 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   });
 
   const buttonStyle = useAnimatedStyle(() => {
-    const bg = interpolateColor(progress.value, [0, 1], ['#2563eb', '#1e3a8a']);
-    const op = interpolate(progress.value, [0, 1], [1, 0]);
+    const bg = buttonBg.value; // interpolateColor(progress.value, [0, 1], ['#2563eb', '#1e3a8a']);
+    const op = buttonOp.value; // interpolate(progress.value, [0, 1], [1, 0]);
     return {
       opacity: op,
       position: 'absolute',
@@ -121,7 +175,13 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
       width: '100%',
       zIndex: 10,
       justifyContent: 'center',
-      opacity: opacity.value,
+      opacity: contentOpacity.value,
+    };
+  });
+
+  const subContent = useAnimatedStyle(() => {
+    return {
+      opacity: subContentOpacity.value,
     };
   });
 
@@ -146,6 +206,17 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
             position: 'absolute',
             justifyContent: 'center',
             alignItems: 'center',
+            // borderWidth: 1,
+            // borderColor: 'black',
+            // shadowColor: '#000',
+            // shadowOffset: {
+            //   width: 0,
+            //   height: 2,
+            // },
+            // shadowOpacity: 0.25,
+            // shadowRadius: 3.84,
+
+            // elevation: 5,
           },
           animatedStyle,
         ]}
@@ -194,66 +265,69 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
             />
           </Box>
 
-          <Row>
-            <Box
-              borderWidth={2}
-              borderColor="border"
-              borderRadius={'full'}
-              style={{
-                height: 60,
-                flexDirection: 'row',
-                // padding: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              width="32"
-            >
-              <MaterialIcons
-                name="calendar-today"
-                size={24}
-                color={theme.colors.darkBorder}
-                style={{
-                  marginRight: 10,
-                }}
-              />
-              <Text fontWeight={'bold'} color="darkBorder">
-                Today
-              </Text>
-            </Box>
-            <Box
-              ml="2"
-              borderWidth={2}
-              borderColor="border"
-              borderRadius={'full'}
-              style={{
-                height: 60,
-                width: 60,
-
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
+          <Animated.View style={subContent}>
+            <Row>
               <Box
+                borderWidth={2}
+                borderColor="border"
                 borderRadius={'full'}
                 style={{
-                  borderWidth: 2,
-                  height: 25,
-                  width: 25,
+                  height: 60,
+                  flexDirection: 'row',
+                  // padding: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                width="32"
+              >
+                <MaterialIcons
+                  name="calendar-today"
+                  size={24}
+                  color={theme.colors.darkBorder}
+                  style={{
+                    marginRight: 10,
+                  }}
+                />
+                <Text fontWeight={'bold'} color="darkBorder">
+                  Today
+                </Text>
+              </Box>
+              <Box
+                ml="2"
+                borderWidth={2}
+                borderColor="border"
+                borderRadius={'full'}
+                style={{
+                  height: 60,
+                  width: 60,
 
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                borderColor="primary"
               >
-                <Box borderRadius={'full'} style={{ height: 15, width: 15 }} bg="primary" />
+                <Box
+                  borderRadius={'full'}
+                  style={{
+                    borderWidth: 2,
+                    height: 25,
+                    width: 25,
+
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  borderColor="primary"
+                >
+                  <Box borderRadius={'full'} style={{ height: 15, width: 15 }} bg="primary" />
+                </Box>
               </Box>
-            </Box>
-          </Row>
-          <Row ml="16" mt="16" width={'40%'} justifyContent="space-between">
-            <Feather name="folder-plus" size={24} color={theme.colors.darkBorder} />
-            <MaterialIcons name="outlined-flag" size={24} color={theme.colors.darkBorder} />
-            <Feather name="moon" size={24} color={theme.colors.darkBorder} />
-          </Row>
+            </Row>
+
+            <Row ml="16" mt="16" width={'40%'} justifyContent="space-between">
+              <Feather name="folder-plus" size={24} color={theme.colors.darkBorder} />
+              <MaterialIcons name="outlined-flag" size={24} color={theme.colors.darkBorder} />
+              <Feather name="moon" size={24} color={theme.colors.darkBorder} />
+            </Row>
+          </Animated.View>
         </MotiView>
         <MotiView
           delay={visible ? 280 : 0}
@@ -266,22 +340,24 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
             right: 30,
           }}
         >
-          <Pressable
-            onPress={onNewTaskPress}
-            flexDirection={'row'}
-            height={60}
-            borderRadius="full"
-            shadow="3"
-            justifyContent={'center'}
-            alignItems="center"
-            bg="primary"
-            width={170}
-          >
-            <Text mr="4" fontWeight={'bold'} color="white">
-              New task
-            </Text>
-            <Feather name="chevron-up" size={26} color="white" />
-          </Pressable>
+          <Animated.View style={subContent}>
+            <Pressable
+              onPress={onNewTaskPress}
+              flexDirection={'row'}
+              height={60}
+              borderRadius="full"
+              shadow="3"
+              justifyContent={'center'}
+              alignItems="center"
+              bg="primary"
+              width={170}
+            >
+              <Text mr="4" fontWeight={'bold'} color="white">
+                New task
+              </Text>
+              <Feather name="chevron-up" size={26} color="white" />
+            </Pressable>
+          </Animated.View>
         </MotiView>
       </Animated.View>
     </>

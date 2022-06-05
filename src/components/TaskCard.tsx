@@ -12,10 +12,11 @@ const TaskCard: React.FC<ITaskCardProps> = ({ task, useAnimation }) => {
   const entering = (values) => {
     'worklet';
     const duration = 300;
+    const delay = 175;
     const animations = {
-      originY: withDelay(25, withTiming(values.targetOriginY, { duration: duration })),
-      originX: withDelay(25, withTiming(values.targetOriginX, { duration: duration })),
-      transform: [{ scale: withDelay(25, withTiming(1, { duration: duration })) }],
+      originY: withDelay(delay, withTiming(values.targetOriginY, { duration: duration })),
+      originX: withDelay(delay, withTiming(values.targetOriginX, { duration: duration })),
+      transform: [{ scale: withDelay(delay, withTiming(1, { duration: duration })) }],
     };
     const initialValues = {
       // originX: -width,
@@ -34,7 +35,7 @@ const TaskCard: React.FC<ITaskCardProps> = ({ task, useAnimation }) => {
     <Animated.View
       entering={useAnimation ? entering : undefined}
       // entering={SlideInRight.delay(index * 100)}
-      layout={Layout.springify()}
+      layout={Layout.springify().stiffness(100).damping(20)}
     >
       <Box
         borderRadius="2xl"
