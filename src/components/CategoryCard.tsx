@@ -2,7 +2,8 @@ import React from 'react';
 import { VStack, Box, Text } from 'native-base';
 export type ICategoryCardProps = {};
 
-const CategoryCard: React.FC<ICategoryCardProps> = () => {
+const CategoryCard: React.FC<ICategoryCardProps> = ({ category }) => {
+  const { label, numTasks, color } = category;
   return (
     <Box
       // borderWidth="1"
@@ -15,9 +16,33 @@ const CategoryCard: React.FC<ICategoryCardProps> = () => {
     >
       <VStack space="4">
         <Box px="4" pt="4">
-          <Text fontSize={'xs'}>40 tasks</Text>
+          <Text fontSize={12} color="gray.400" fontWeight={'400'}>
+            {numTasks} tasks
+          </Text>
+          <Text fontWeight={'600'} fontSize={18}>
+            {label}
+          </Text>
         </Box>
-        <Box px="4">Business</Box>
+        <Box
+          borderRadius={'full'}
+          style={{
+            height: 3,
+
+            width: '85%',
+
+            alignSelf: 'center',
+          }}
+          bg="gray.200"
+        >
+          <Box
+            borderRadius={'full'}
+            style={{
+              height: '100%',
+              width: '40%',
+            }}
+            bg={color}
+          />
+        </Box>
       </VStack>
     </Box>
   );

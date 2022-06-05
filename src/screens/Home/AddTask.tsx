@@ -229,7 +229,7 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
                 borderRadius: 12,
                 borderWidth: 0,
                 fontSize: 26,
-                color: theme.colors.darkBorder,
+                color: theme.colors.text,
               }}
             />
           </Box>

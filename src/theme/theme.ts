@@ -15,6 +15,7 @@ const Colors = {
   primary: '#0375FF',
   border: '#EDF0FC',
   darkBorder: '#8595C6',
+  text: '#394063',
 };
 
 const theme = extendTheme({

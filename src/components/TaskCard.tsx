@@ -20,7 +20,7 @@ const TaskCard: React.FC<ITaskCardProps> = ({ task, useAnimation }) => {
     };
     const initialValues = {
       // originX: -width,
-      originY: -80,
+      originY: -100,
       originX: 90,
       // opacity: 0,
       // borderRadius: 10,
@@ -31,6 +31,9 @@ const TaskCard: React.FC<ITaskCardProps> = ({ task, useAnimation }) => {
       animations,
     };
   };
+
+  //#4587E0
+  //#F102FF
   return (
     <Animated.View
       entering={useAnimation ? entering : undefined}
@@ -48,8 +51,22 @@ const TaskCard: React.FC<ITaskCardProps> = ({ task, useAnimation }) => {
         alignItems={'center'}
         padding={'3'}
       >
-        <Checkbox value="" accessibilityLabel="This is a dummy checkbox" />
-        <Text marginLeft={'4'} color="darkBorder" fontWeight={'500'}>
+        <Checkbox
+          value=""
+          accessibilityLabel="This is a dummy checkbox"
+          borderRadius={'full'}
+          _checked={{
+            bg: task.color,
+            borderColor: task.color,
+            // borderWidth: 0,
+          }}
+          _unchecked={{
+            borderColor: task.color,
+            bg: task.color,
+          }}
+          borderColor={task.color}
+        />
+        <Text marginLeft={'4'} color="text" fontWeight={'500'}>
           {task.task}
         </Text>
       </Box>
