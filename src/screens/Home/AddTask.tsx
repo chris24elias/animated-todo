@@ -47,18 +47,11 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   const onNewTaskPress = () => {
     addNewTask(text);
 
-    // setTimeout(() => {
-    //   containerOpacity.value = withTiming(0, { duration: 400 });
-    //   contentOpacity.value = withTiming(0, { duration: 200 });
-    // }, 50);
-
     containerHeight.value = withTiming(88, {
       duration: 375,
-      // easing: Easing.inOut(Easing.ease),
     });
     containerY.value = withTiming(290, {
       duration: 375,
-      // easing: Easing.inOut(Easing.ease),
     });
 
     containerOpacity.value = withDelay(325, withTiming(0, { duration: 50 }));
@@ -77,11 +70,6 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
   };
 
   useEffect(() => {
-    // progress.value = withTiming(visible ? 1 : 0, {
-    //   duration: 450,
-    //   easing: Easing.inOut(Easing.ease),
-    // });
-
     if (visible) {
       maximize();
     } else {
@@ -134,11 +122,11 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     const size = screenHeight * 2;
-    const height = containerHeight.value; // interpolate(progress.value, [0, 1], [btnLayout.height, size]);
-    const width = containerWidth.value; // interpolate(progress.value, [0, 1], [btnLayout.height, size]);
-    // const offset = size / 2 - screenWidth / 2;
-    const x = containerX.value; // interpolate(progress.value, [0, 1], [btnLayout.x, -offset]);
-    const y = containerY.value; //interpolate(progress.value, [0, 1], [btnLayout.y, -offset]);
+    const height = containerHeight.value;
+    const width = containerWidth.value;
+
+    const x = containerX.value;
+    const y = containerY.value;
 
     return {
       opacity: containerOpacity.value,
@@ -149,12 +137,15 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
       left: x,
       backgroundColor: 'white',
       zIndex: 9,
+      position: 'absolute',
+      justifyContent: 'center',
+      alignItems: 'center',
     };
   });
 
   const buttonStyle = useAnimatedStyle(() => {
-    const bg = buttonBg.value; // interpolateColor(progress.value, [0, 1], ['#2563eb', '#1e3a8a']);
-    const op = buttonOp.value; // interpolate(progress.value, [0, 1], [1, 0]);
+    const bg = buttonBg.value;
+    const op = buttonOp.value;
     return {
       opacity: op,
       position: 'absolute',
@@ -199,28 +190,7 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
         </Pressable>
       </Animated.View>
 
-      <Animated.View
-        pointerEvents={visible ? 'auto' : 'none'}
-        style={[
-          {
-            position: 'absolute',
-            justifyContent: 'center',
-            alignItems: 'center',
-            // borderWidth: 1,
-            // borderColor: 'black',
-            // shadowColor: '#000',
-            // shadowOffset: {
-            //   width: 0,
-            //   height: 2,
-            // },
-            // shadowOpacity: 0.25,
-            // shadowRadius: 3.84,
-
-            // elevation: 5,
-          },
-          animatedStyle,
-        ]}
-      />
+      <Animated.View pointerEvents={visible ? 'auto' : 'none'} style={animatedStyle} />
       <Animated.View style={contentStyle} pointerEvents={visible ? 'auto' : 'none'}>
         <Pressable
           onPress={toggleVisible}
@@ -261,7 +231,6 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
                 fontSize: 26,
                 color: theme.colors.darkBorder,
               }}
-              autoFocus
             />
           </Box>
 
@@ -274,7 +243,6 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
                 style={{
                   height: 60,
                   flexDirection: 'row',
-                  // padding: 10,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
@@ -331,7 +299,6 @@ const AddTask: React.FC<IAddTaskProps> = ({ addNewTask }) => {
         </MotiView>
         <MotiView
           delay={visible ? 280 : 0}
-          // from={{ opacity: 0 }}
           animate={{ opacity: visible ? 1 : 0, translateY: !visible ? -50 : 0 }}
           transition={{ type: 'timing', duration: 400 }}
           style={{
