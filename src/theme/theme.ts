@@ -24,7 +24,9 @@ const theme = extendTheme({
 
   components: {
     Text: {
-      defaultProps: {},
+      defaultProps: {
+        color: 'text',
+      },
       variants: {
         header: {
           fontWeight: 'bold',
