@@ -1,8 +1,7 @@
 // import { FontAwesome } from "@expo/vector-icons";
 // import * as Font from "expo-font";
-import initializeLocalization from "@/localization";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect, useState } from 'react';
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -18,7 +17,6 @@ export default function useCachedResources() {
         //   ...FontAwesome.font,
         //   "space-mono": require("../../assets/fonts/SpaceMono-Regular.ttf"),
         // });
-        await initializeLocalization();
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
