@@ -89,6 +89,7 @@ const Home: React.FC<IHomeProps> = () => {
         contentContainerStyle={{
           paddingBottom: 50,
         }}
+        showsVerticalScrollIndicator={false}
       >
         <Text
           fontSize={'xs'}
@@ -100,7 +101,12 @@ const Home: React.FC<IHomeProps> = () => {
           CATEGORIES
         </Text>
         <Box marginTop={'3'}>
-          <ScrollView paddingLeft={'5'} paddingY={'2'} horizontal>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            paddingLeft={'5'}
+            paddingY={'2'}
+            horizontal
+          >
             {CATEGORIES.map((val, i) => {
               return <CategoryCard key={i} category={val} />;
             })}
@@ -111,7 +117,7 @@ const Home: React.FC<IHomeProps> = () => {
           fontSize={'xs'}
           paddingLeft={'5'}
           paddingY={'2'}
-          marginTop={'6'}
+          marginTop={'4'}
           color="gray.400"
           fontWeight={'bold'}
         >

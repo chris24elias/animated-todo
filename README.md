@@ -1,27 +1,30 @@
-## Includes
+## Animated Todo App
 
-- React-native 0.68.2
-- React-Navigation v6
-- Axios and React Query for REST APIs
-- Localization with react-i18next
-- Pre-installed with Reanimated 2 and Gesture-Handler
-- React Native SVG
-- Native-Base for UI and theming
-- Husky and ESlint
-- Reactotron for debugging
+### Simple Todo app with animations.
 
-## Getting Started
+- Built using Expo, react-navigation, and react-native-reanimated
 
-**Step 1:** Clone and Install
+### Running the app
 
 ```sh
+$ git clone https://https://github.com/chris24elias/Animated-todo.git
 
-$ git clone https://github.com/chris24elias/react-native-expo-template-2022.git
-
-$ cd react-native-expo-template-2022
-
-$ rm -rf ./.git
+$ cd Animated-todo
 
 $ yarn
 
+ios:
+
+$ yarn ios
+
+android:
+
+$ yarn android
 ```
+
+# Demo
+
+<p float="left">
+  <img src="assets/drawer.gif" width="49%" />
+  <img src="assets/todo.gif" width="49%" /> 
+</p>
