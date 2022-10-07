@@ -4,6 +4,8 @@
 
 - Built using Expo, react-navigation, and react-native-reanimated
 
+<img src="assets/animated-todo.jpeg"  />
+
 ### Running the app
 
 ```sh
